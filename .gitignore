@@ -99,3 +99,8 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+
+# Model files
+*.h5
+*.pkl
