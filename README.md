@@ -14,3 +14,7 @@ Models from `scikit-learn` should be saved with `joblib`, and have filenames sta
 
 - Authentication
 - Better error handling
+- Better readme
+- Moar commentz ( and don't forget the docstrings )
+- Support XGBoost models
+- Figure out why sklearn.linear_model.LinearRegression can't be pickled
