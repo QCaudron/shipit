@@ -27,9 +27,9 @@ class ShipIt:
 
 		# Import all models, storing them in a dict with their filename as key
 		for filename in keras_models:
-			models[filename.split(".")[0]] = load_model(filename)
+			models[self._parse_model_filename(filename)] = load_model(filename)
 		for filename in sklearn_models:
-			models[filename.split(".")[0]] = joblib.load(filename)
+			models[self._parse_model_filename(filename)] = joblib.load(filename)
 
 		self.models = models
 
@@ -99,3 +99,13 @@ class ShipIt:
 			raise
 
 		return X
+
+	def _parse_model_filename(self, filename):
+
+		# Remove the models/ dir prefix
+		filename = filename.replace("models/", "")
+
+		# Remove the file extension
+		filename = "".join(filename.split(".")[:-1])
+
+		return filename

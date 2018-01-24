@@ -22,7 +22,6 @@ def predict(model_name):
 	# Generate a prediction
 	try:
 		return shipit.predict(model_name, request.get_json())
-
 	except:
 		raise
 
