@@ -1,0 +1,23 @@
+---
+- name: Provision ShipIt box 
+  hosts: all 
+  become: true 
+
+  tasks:
+    - name: get aptitude
+      apt: pkg=aptitude state=present
+
+    - name: Safe system upgrade via aptitude
+      apt: upgrade=safe
+
+    - name: install base packages
+      apt: pkg={{item}} state=present
+      with_items:
+        - vim
+        - git
+
+    - name: download Miniconda
+      get_url: url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh dest=/tmp
+
+    - name: install Miniconda
+      command: sh /tmp/Miniconda-latest-Linux-x86_64.sh -b -p /home/ubuntu/miniconda
