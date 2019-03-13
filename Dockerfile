@@ -1,38 +1,65 @@
 FROM ubuntu:16.04 
 WORKDIR /var/www/shipit/
 
+
+
 # Update OS packages
 RUN apt-get update && apt-get -y upgrade
 
-# Install necessary OS packages
-RUN apt-get install --no-install-recommends --no-install-suggests -y \
+
+
+# Install packages needed for Miniconda
+RUN apt-get install -y \
+	bzip2 \
 	build-essential \
-	python3 \
+	curl \ 
+	git \
+	libboost-python-dev \
+	libpython3-dev \
 	python3-dev \
-	python3-setuptools \
-	python3-pip \
-	git
+	wget
 
-#RUN apt-get install --no-install-recommends --no-install-suggests -y \
-#	nginx
+# Download anaconda install
+RUN curl -O https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
 
-# Update pip; install necessary pip packages
-RUN pip3 install --upgrade pip
-RUN pip3 install wheel uwsgi
+# Turn executable attribute
+RUN chmod +x Miniconda3-latest-Linux-x86_64.sh 
 
-# Install application requirements and code
-# requirements.txt is copied before the rest for rebuild speed reasons
-COPY requirements.txt /var/www/shipit/
-RUN pip3 install -r requirements.txt
+# Install Anaconda
+RUN bash Miniconda3-latest-Linux-x86_64.sh -b
 
-# Copy files
+# Remove Instalation file
+RUN rm Miniconda3-latest-Linux-x86_64.sh
+
+# Add Anaconda to the Path
+ENV PATH /root/miniconda3/bin:$PATH 
+
+
+
+# Copy local code
 COPY . /var/www/shipit/
-#RUN ln -s /var/www/app/nginx-app.conf /etc/nginx/conf.d/
-#RUN /etc/init.d/nginx restart
 
-# Copy the repo containing the ML model
-# git clone 
+
+
+# Install pipreqs
+RUN pip install pipreqs 
+
+# Generate a requirements.txt file
+RUN pipreqs /var/www/shipit/ --force
+RUN /bin/bash -c 'cat /var/www/shipit/requirements.txt'
+
+# Install user packages, from conda where possible and otherwise from pip
+RUN /bin/bash -c 'while read requirement; do conda install -y $requirement || pip install $requirement; done < requirements.txt'
+
+
+
+# Install uwsgi
+RUN conda install -c conda-forge -y uwsgi
+
+
 
 # Do the thing
 EXPOSE 5000
 ENTRYPOINT uwsgi /var/www/shipit/config/uwsgi-app.ini
+
+#CMD ["bash"]

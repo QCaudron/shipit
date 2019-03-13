@@ -58,31 +58,6 @@ class ShipIt:
 			print("Could not generate a prediction.\n")
 			raise
 
-	def generate_requirements(self, filepath):
-		"""
-		Generate a requirements.txt file. Run this from within the envinronment in
-		which you saved your models, to ensure all packages have the same versions.
-		"""
-		
-		required_versions = []
-		required_packages = {
-			"flask": "Flask",
-			"numpy": "numpy",
-			"scipy": "scipy",
-			"sklearn": "scikit-learn",
-			"tensorflow": "tensorflow",
-			"keras": "keras",
-			"h5py": "h5py"
-		}
-
-		for package, package_name in required_packages.items():
-			version = import_module("{}".format(package)).__version__
-			required_versions.append("{}=={}\n".format(package_name, version))
-
-		with open(filepath + "/requirements.txt", "w") as f:
-			for line in required_versions:
-				f.write(line)
-
 	def _parse_request(self, json_data):
 		"""
 		Parse the JSON request and return it in numpy form. Validation occurs here.
