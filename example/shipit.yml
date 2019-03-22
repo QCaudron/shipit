@@ -1,0 +1,10 @@
+meta:
+  image: python:3
+  requirements: requirements.txt
+
+models:
+  rfc:
+    path: models/sklearn_rfc.pkl
+    variety: "sklearn"
+
+

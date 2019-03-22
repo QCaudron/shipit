@@ -1,0 +1,10 @@
+meta:
+  image: python:3
+  requirements: path/to/requirements.txt
+
+models:
+  modelname:
+    path: path/to/serialized/model/file
+    variety: sklearn|keras
+
+
