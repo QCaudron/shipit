@@ -1,0 +1,10 @@
+meta:
+  image: python:3
+  python-packages: "(pip freeze)|Pipfile|requirements.txt|-numpy\n-scikit-learn"
+
+models:
+  rfc:
+    path: models/sklearn_rfc.pkl
+    variety: "sklearn"
+
+

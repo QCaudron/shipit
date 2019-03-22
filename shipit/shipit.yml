@@ -1,0 +1,10 @@
+meta:
+  image: python:3
+  python-packages: (pip freeze)|Pipfile|requirements.txt|-numpy\n-scikit-learn
+
+models:
+  modelname:
+    path: path/to/serialized/model/file
+    variety: sklearn|keras
+
+
