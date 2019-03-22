@@ -1,6 +1,6 @@
 meta:
   image: python:3
-  python-packages: (pip freeze)|Pipfile|requirements.txt|-numpy\n-scikit-learn
+  requirements: path/to/requirements.txt
 
 models:
   modelname:

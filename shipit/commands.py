@@ -10,7 +10,7 @@ import os
 import yaml
 
 
-logger = logging.getLogger('shipit')
+logger = logging.getLogger("shipit")
 
 
 def load_config():
@@ -37,8 +37,8 @@ def build(tag="shipit"):
 
     # Copy models to /temp/models/ folder
     for name, model_settings in config.get("models").items():
-        # Model files get copied to an identical path 
-        # inside the image's `models` folder. 
+        # Model files get copied to an identical path
+        # inside the image's `models` folder.
         # So the local `models/sklearn_rfc.pkl` will get copied to
         # `/temp/models/sklearn_rfc.pkl`
         # or `really/long/path/model.pkl` -> `/temp/models/really/long/path/model.pkl`
@@ -48,16 +48,20 @@ def build(tag="shipit"):
         destination = os.path.join(build_dir, path)
         os.makedirs(os.path.dirname(destination), exist_ok=True)
         shutil.copy(path, destination)
-    
+
+    requirements_path = config.get("meta", {}).get("requirements", "requirements.txt")
+
     # Create requirements file
-    shutil.copy("requirements.txt", build_dir)
+    shutil.copy(requirements_path, build_dir)
 
     # Copy over the config so we know stuff about the models
     shutil.copy("shipit.yml", build_dir)
 
     # Copy the web app over
     shutil.copy(os.path.join(shipit_path, "app.py"), build_dir)
-    shutil.copytree(os.path.join(shipit_path, "config/"), os.path.join(build_dir, "config"))
+    shutil.copytree(
+        os.path.join(shipit_path, "config/"), os.path.join(build_dir, "config")
+    )
 
     # Template the Dockerfile to temp/Dockerfile
     shutil.copy(os.path.join(shipit_path, "Dockerfile"), build_dir)
