@@ -33,9 +33,11 @@ setup(
     include_package_data=True,
     python_requires='!=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, <4',
     install_requires=[
-        'docker==3.7.1',
+        'docker>=3',
         'numpy>=1',
-        'pyyaml==5.1'
+        'awscli',
+        'pyyaml=>=3.13,<=3.15',
+        'delegator.py>=0.1.1',
     ],
     entry_points={
         'console_scripts': [

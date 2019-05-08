@@ -1,7 +1,9 @@
 from flask import Flask, request, Response
 import json
 import yaml
+import os
 import numpy as np
+from utils import import_func
 
 
 class ShipIt:
@@ -10,23 +12,37 @@ class ShipIt:
         Load all sklearn and keras models into RAM.
         """
         with open("shipit.yml") as config_file:
-            self.config = yaml.load(config_file, Loader=yaml.FullLoader)
+
+            self.config = yaml.load(config_file)
+        
+        self.version = "0"
+        if os.path.exists("./VERSION"):
+            with open("VERSION")  as version_file:
+                self.version = version_file.read().strip()
 
         # Load all models
         self.models = self.config.get("models", {})
-        for name, settings in self.models.items():
-            variety = settings.get("variety")
+        for model_name, model_settings in self.models.items():
+            variety = model_settings.get("variety")
             if variety == "keras":
                 # Dynamically import libraries only if needed
                 from keras.models import load_model
 
-                settings["instance"] = load_model(settings["path"])
+                model_settings["instance"] = load_model(model_settings["path"])
             elif variety == "sklearn":
                 from sklearn.externals import joblib
 
-                settings["instance"] = joblib.load(settings["path"])
+                model_settings["instance"] = joblib.load(model_settings["path"])
             else:
-                raise Exception("Could not load model {}".format(name))
+                raise Exception("Could not load model {}".format(model_name))
+            
+            # Get pre/post process functions
+            for stage in ['preprocess', 'postprocess']:
+                stage_dot = model_settings.get(stage, None)
+                if stage_dot is not None:
+                    func = import_func(stage_dot)
+                    model_settings[stage] = func
+
 
     def index(self):
         model_index = {}
@@ -36,6 +52,7 @@ class ShipIt:
             }
         return model_index
 
+
     def predict(self, model_name, request_data):
         """
         Given a model name and the JSON bundle from the API request,
@@ -43,17 +60,27 @@ class ShipIt:
         """
 
         # Grab the correct model object
-        model = self.models.get(model_name, {}).get("instance", None)
+        model_settings = self.models.get(model_name, {})
+        model = model_settings.get("instance", None)
         if model is None:
             raise ValueError("The specified model was not found.")
 
         # Parse prediction request data
         incoming = self._parse_request(request_data)
 
+        # Optional preprocess step
+        preprocess = model_settings.get('preprocess')
+        if preprocess:
+            incoming = preprocess(incoming)
+
         # Generate a prediction
         prediction = model.predict(incoming)
         prediction = np.atleast_2d(prediction).reshape(len(incoming), -1)
         prediction = prediction.tolist()
+
+        postprocess = model_settings.get('postprocess')
+        if postprocess:
+            prediction = postprocess(prediction)
         return prediction
 
     def _parse_request(self, request_data):
@@ -80,7 +107,8 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     model_index = shipit.index()
-    return Response(json.dumps(model_index), mimetype="application/json")
+    resp = { "meta": { "version": shipit.version }, "models": model_index }
+    return Response(json.dumps(resp), mimetype="application/json")
 
 
 # Prediction endpoint

@@ -1,12 +1,16 @@
-FROM python:3
+FROM python:3.7
 ENV PYTHONUNBUFFERED 1
 
 WORKDIR /shipit/
 
 # Install OS Packages
 RUN apt-get update && apt-get install -y \
-    python-dev python-pip python-setuptools \
-    openssl python3-service-identity python3-openssl
+    python-dev \
+    python-pip \
+    python-setuptools \
+    openssl \
+    python3-service-identity \
+    python3-openssl
 
 # Install pipreqs
 RUN pip3 install uwsgi flask pyyaml

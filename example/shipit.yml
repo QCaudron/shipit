@@ -1,10 +1,15 @@
 meta:
-  image: python:3
+  project_name: separate
   requirements: requirements.txt
+  provider: aws
+  aws_profile: 034806456725
+  aws_region: us-west-2
 
 models:
   rfc:
     path: models/sklearn_rfc.pkl
     variety: "sklearn"
+    preprocess: extras.wrappers.rfc_preprocess
+    postprocess: extras.wrappers.rfc_postprocess
 
 
