@@ -1,10 +1,15 @@
 meta:
-  image: python:3
+  project_name: (your_project_name)
   requirements: path/to/requirements.txt
+  provider: aws
+  aws_profile: 'your aws cred profile'
+  aws_region: us-west-2
 
 models:
   modelname:
     path: path/to/serialized/model/file
     variety: sklearn|keras
+    preprocess: (dot.path.to.pre.function)
+    postprocess: (dot.path.to.post.function)
 
 

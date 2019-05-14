@@ -91,6 +91,9 @@ ENV/
 .spyderproject
 .spyproject
 
+# VSCode
+.vscode
+
 # Rope project settings
 .ropeproject
 
@@ -104,3 +107,11 @@ ENV/
 # Model files
 *.h5
 *.pkl
+
+# OSX
+*.DS_Store
+
+# Terraform
+*.terraform
+*.tfstate
+*.tfstate.backup
