@@ -36,7 +36,7 @@ setup(
         'docker>=3',
         'numpy>=1',
         'awscli',
-        'pyyaml=>=3.13,<=3.15',
+        'pyyaml>=3.13,<3.15',
         'delegator.py>=0.1.1',
     ],
     entry_points={
