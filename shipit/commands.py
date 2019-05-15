@@ -10,7 +10,7 @@ import docker
 import os
 import delegator
 
-from .utils import load_config, import_func
+from .utils import load_config, import_func, validate_config
 
 
 logger = logging.getLogger("shipit")
@@ -43,6 +43,7 @@ def build(tag="shipit", version=1, verbosity=1):
     logger.info("Building...")
     shipit_path = os.path.dirname(os.path.realpath(__file__))
     config = load_config()
+    validate_config(config)
 
     build_dir = tempfile.mkdtemp()
 
@@ -125,6 +126,7 @@ def build(tag="shipit", version=1, verbosity=1):
 
 def deploy(tag="shipit", verbosity=1):
     config = load_config()
+    validate_config(config)
 
     vars = {
         "project_name": config.get("meta", {}).get("project_name", "shipit"),
@@ -157,9 +159,12 @@ def deploy(tag="shipit", verbosity=1):
     logger.info("AWS Region: {}".format(vars["region"]))
 
     logger.info("Initializing Terraform Installation")
-    delegator.run("terraform init -input=false -from-module={}".format(
+    init_cmd = delegator.run("terraform init -input=false -from-module={}".format(
         plan_path
     ))
+    if verbosity > 1:
+        logger.info(init_cmd.out)
+        logger.info(init_cmd.err)
 
     if not repository:
         logger.info("No existing repository, creating infrastructure.")
@@ -171,11 +176,15 @@ def deploy(tag="shipit", verbosity=1):
             vars=get_var_string(vars)
         )
         output = delegator.run(apply_cmd)
+        if verbosity > 1:
+            logger.info(output.out)
+            logger.info(output.err)
         cmd = delegator.run("terraform output -state={} ecr_repository".format(state_path))
         repository = cmd.out.strip()
 
     logger.info("Building Docker image version {}".format(vars["project_version"]))
     tag = "{}:{}".format(repository, vars["project_version"])
+    logger.info("Taggin as {}".format(tag))
     build(tag=tag, version=vars["project_version"], verbosity=verbosity)
 
     logger.info("Pushing docker image...")
@@ -233,3 +242,4 @@ def destroy(tag="shipit"):
     else:
         logger.info("There was an error: ")
         logger.info(cmd.out)
+        logger.info(cmd.err)

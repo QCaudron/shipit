@@ -1,11 +1,14 @@
 # ShipIt
 
-Easily deploy your machine learning models to an API in the cloud.
+Easily deploy machine learning models to an API in the cloud.
+
+## Prerequisites
+
+Currently AWS is the only provider. You will need an AWS account and credentials that let you modify infrastructure.
 
 ## Quickstart
 
-1. Install and configure awscli
-1. Install terraform
+1. Install and configure docker, awscli, and terraform
 1. `pip install shipit`
 1. `shipit init`
 1. Edit the newly created `shipit.yml` See [configuration](#configuration)
@@ -20,7 +23,7 @@ Version             : 2
 ```
 
 ## How it Works
-Shipit wraps tools like docker, awscli, and terraform to make it easy to deploy production ready web APIs for your machine learning models. First a docker image is built based on the configurat
+Shipit takes a serialized machine learning model (currently sklearn and keras supported) and wraps it in a web api. We build a Docker image from it and then deploy it to a provider like AWS using terraform.
 
 
 ## Running Locally
@@ -126,5 +129,7 @@ Models from `scikit-learn` should be saved with `joblib`. Models from `keras` sh
 - Deploy to Private VPN
 - Route53 / private / public DNS
 - Build an "export" feature for customization of Docker / terraform setup.
+- AWS Lambda Provider
+- Heroku Provider
 - Support XGBoost models
 - Figure out why sklearn.linear_model.LinearRegression can't be pickled

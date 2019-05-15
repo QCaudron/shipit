@@ -1,14 +1,25 @@
 
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages
-from os import path
+import os
 from io import open
 
-here = path.abspath(path.dirname(__file__))
+here = os.path.abspath(os.path.dirname(__file__))
 
 # Get the long description from the README file
-with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
+
+
+def package_files(directory):
+    paths = []
+    for (path, directories, filenames) in os.walk(directory):
+        for filename in filenames:
+            paths.append(os.path.join('..', path, filename))
+    return paths
+
+terraform_files = package_files('shipit/terraform')
+print(terraform_files)
 
 
 setup(
@@ -29,7 +40,7 @@ setup(
     ],
     keywords='machine learning scikit keras docker',
     packages=find_packages(exclude=['contrib', 'docs', 'tests', 'example']),  # Required
-    package_data={'': ['shipit.yml', 'Dockerfile', 'config/*']},
+    package_data={'': ['shipit.yml', 'Dockerfile', 'config/*', *terraform_files]},
     include_package_data=True,
     python_requires='!=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, <4',
     install_requires=[

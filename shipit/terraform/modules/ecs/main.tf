@@ -142,7 +142,7 @@ data "aws_iam_policy_document" "ecs_service_role" {
 }
 
 resource "aws_iam_role" "ecs_role" {
-  name               = "ecs_role"
+  name               = "${vars.project_name}_ecs_role"
   assume_role_policy = "${data.aws_iam_policy_document.ecs_service_role.json}"
 }
 
@@ -162,18 +162,18 @@ data "aws_iam_policy_document" "ecs_service_policy" {
 
 /* ecs service scheduler role */
 resource "aws_iam_role_policy" "ecs_service_role_policy" {
-  name   = "ecs_service_role_policy"
+  name   = "${var.project_name}_ecs_service_role_policy"
   policy = "${data.aws_iam_policy_document.ecs_service_policy.json}"
   role   = "${aws_iam_role.ecs_role.id}"
 }
 
 /* role that the Amazon ECS container agent and the Docker daemon can assume */
 resource "aws_iam_role" "ecs_execution_role" {
-  name               = "ecs_task_execution_role"
+  name               = "${var.project_name}_ecs_task_execution_role"
   assume_role_policy = "${file("${path.module}/policies/ecs-task-execution-role.json")}"
 }
 resource "aws_iam_role_policy" "ecs_execution_role_policy" {
-  name   = "ecs_execution_role_policy"
+  name   = "${var.project_name}_ecs_execution_role_policy"
   policy = "${file("${path.module}/policies/ecs-execution-role-policy.json")}"
   role   = "${aws_iam_role.ecs_execution_role.id}"
 }

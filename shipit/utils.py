@@ -8,6 +8,15 @@ def load_config():
     return config_data
 
 
+def validate_config(config):
+    """
+    Validate the properties of a configuration file
+    """
+    project_name = config.get("meta", {}).get("project_name", "shipit"),
+    if "_" in project_name:
+        raise Exception("Project name cannot include '_'")
+
+
 def import_func(dot_path):
     """
     Returns a class object from dot path notation
