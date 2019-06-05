@@ -142,7 +142,7 @@ data "aws_iam_policy_document" "ecs_service_role" {
 }
 
 resource "aws_iam_role" "ecs_role" {
-  name               = "${vars.project_name}_ecs_role"
+  name               = "${var.project_name}_ecs_role"
   assume_role_policy = "${data.aws_iam_policy_document.ecs_service_role.json}"
 }
 

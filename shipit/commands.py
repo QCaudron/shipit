@@ -162,6 +162,7 @@ def deploy(tag="shipit", verbosity=1):
     init_cmd = delegator.run("terraform init -input=false -from-module={}".format(
         plan_path
     ))
+    print(init_cmd)
     if verbosity > 1:
         logger.info(init_cmd.out)
         logger.info(init_cmd.err)
@@ -175,6 +176,7 @@ def deploy(tag="shipit", verbosity=1):
             plan_path=plan_path,
             vars=get_var_string(vars)
         )
+        print(apply_cmd)
         output = delegator.run(apply_cmd)
         if verbosity > 1:
             logger.info(output.out)
