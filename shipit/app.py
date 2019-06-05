@@ -4,6 +4,9 @@ import yaml
 import os
 import numpy as np
 from utils import import_func
+import logging
+
+logger = logging.getLogger('shipit')
 
 
 class ShipIt:
@@ -74,7 +77,9 @@ class ShipIt:
             incoming = preprocess(incoming)
 
         # Generate a prediction
-        prediction = model.predict(incoming)
+        predict_method = model_settings.get('predict_method', 'predict')
+        predict_method = getattr(model, predict_method)
+        prediction = predict_method(incoming)
         prediction = np.atleast_2d(prediction).reshape(len(incoming), -1)
         prediction = prediction.tolist()
 
@@ -124,6 +129,7 @@ def predict(model_name):
         data = {
             "error": str(e)
         }
+        logger.exception(e)
         return Response(json.dumps(data), status=500, mimetype="application/json")
 
 
